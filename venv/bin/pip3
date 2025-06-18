@@ -1,4 +1,4 @@
-#!/Users/kruthikaramesh/Documents/GitHub/expense_tracker/expense-tracker-backend/venv/bin/python
+#!/Users/kruthikaramesh/Documents/GitHub/expense_tracker/expense_tracker_backend/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
