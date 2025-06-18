@@ -1,24 +1,19 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from fastapi import Depends
+from typing import Annotated
 from .config import Settings
-from sqlalchemy.orm import declarative_base
+from sqlmodel import SQLModel, Session, create_engine
 
 settings = Settings()
 
 connect_args = {"check_same_thread": False}
 engine = create_engine(settings.DATABASE_URL, connect_args=connect_args)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
 
-Base = declarative_base()
+def get_session():
+    with Session(engine) as session:
+        yield session
 
-def get_db():
-    db = SessionLocal()
-    try :
-        yield db
-    finally:
-        db.close()
+SessionDep = Annotated[Session, Depends(get_session)]
 
-def init_db():
-    from expense_tracker_backend.models import user
-    Base.metadata.create_all(bind=engine)

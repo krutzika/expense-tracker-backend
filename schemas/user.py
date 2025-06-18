@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from datetime import datetime
 
 class UserCreate(BaseModel):
     email : EmailStr
@@ -19,3 +20,9 @@ class UserOut(BaseModel):
 class TokenResponse(BaseModel):
     access_token : str
     token_type : str = 'bearer'
+
+class TokenData(BaseModel):
+    username : str
+
+class UserInDB(UserCreate):
+    hashed_password : str
