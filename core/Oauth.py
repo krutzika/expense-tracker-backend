@@ -4,6 +4,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlmodel import Session, select
+from sqlmodel.ext.asyncio.session import AsyncSession
 from expense_tracker_backend.schemas.user import UserInDB
 from expense_tracker_backend.core.utils import verify_password
 
@@ -15,16 +16,17 @@ settings = Settings()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
-def get_user (db: Session, email : str) -> Optional[User]:
-    user = db.exec(select(User).where(User.email == email)).first()
+async def get_user (db: AsyncSession, email : str) -> Optional[User]:
+    user = await db.exec(select(User).where(User.email == email))
+    return user.first()
 
-def authenticate_user(db: Session, email : str, password : str):
-    user = get_user(db, email)
+async def authenticate_user(db: AsyncSession, email : str, password : str):
+    user = await get_user(db, email)
     if not user or not verify_password(password, user.hashed_password):
         return None
     return user
 
-def create_access_token(data : dict, expires_delta: Optional[timedelta] = None):
+async def create_access_token(data : dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -34,7 +36,7 @@ def create_access_token(data : dict, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
-def get_current_user (token : Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_session)) -> User:
+async def get_current_user (token : Annotated[str, Depends(oauth2_scheme)], db: AsyncSession = Depends(get_session)) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail = "Could not validate credentials",
@@ -48,7 +50,7 @@ def get_current_user (token : Annotated[str, Depends(oauth2_scheme)], db: Sessio
     except JWTError:
         raise credentials_exception
 
-    user = db.get(User, user_id)
+    user = await db.get(User, user_id)
     if user is None:
         raise credentials_exception
     return user
