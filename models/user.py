@@ -8,3 +8,4 @@ class User(SQLModel, table=True):
     hashed_password: str = Field(nullable=False)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+
