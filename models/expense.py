@@ -18,4 +18,4 @@ class Expense(SQLModel, table=True):
     amount : float
     description : str
     category : Category
-    created_at : datetime = Field(default=datetime.utcnow)
+    created_at : datetime = Field(default_factory=datetime.utcnow)

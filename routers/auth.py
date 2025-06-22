@@ -19,7 +19,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db : AsyncSess
         raise HTTPException(status_code=400, detail="Invalid credentials", headers={"WWW-Authenticate": "Bearer"})
 
     access_token_expires = timedelta(minutes=30)
-    access_token = await create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
+    access_token = await create_access_token(data={"sub": str(user.id)}, expires_delta=access_token_expires)
     return TokenResponse(access_token=access_token, token_type="bearer")
 
 @router.post("/register")
