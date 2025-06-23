@@ -34,6 +34,7 @@ class  ExpenseCreate(BaseModel):
     amount : float
     description : str
     category : Category
+    created_at : Optional[datetime]
 
 class ExpenseRead(BaseModel):
     id: int
@@ -50,3 +51,4 @@ class ExpenseUpdate(BaseModel):
     amount : Optional[int] = None
     description : Optional[str] = None
     category : Optional[Category] = None
+    created_at : Optional[datetime]

@@ -11,7 +11,7 @@ async def expense_create(
         user_id : int,
         db : AsyncSession
 ) -> Expense :
-    db_expense = Expense(**expense.dict(), user_id=user_id)
+    db_expense = Expense(**expense.dict(exclude_unset=True), user_id=user_id)
     db.add(db_expense)
     await db.commit()
     await db.refresh(db_expense)
