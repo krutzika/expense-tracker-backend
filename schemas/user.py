@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict
 
 from expense_tracker_backend.models.expense import Category
 
@@ -52,3 +52,9 @@ class ExpenseUpdate(BaseModel):
     description : Optional[str] = None
     category : Optional[Category] = None
     created_at : Optional[datetime]
+
+class ExpenseStatsResponse(BaseModel):
+    stats: Dict[str, float]
+
+    class Config:
+        orm_mode = True
