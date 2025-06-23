@@ -5,7 +5,7 @@ from starlette.status import HTTP_204_NO_CONTENT
 
 from expense_tracker_backend.core.Oauth import get_current_user
 from expense_tracker_backend.schemas.user import ExpenseCreate,ExpenseUpdate, ExpenseRead
-from expense_tracker_backend.services.expense import expense_create, get_expense, expense_read,expense_delete, expense_update
+from expense_tracker_backend.services.expense import ExpenseService
 from expense_tracker_backend.core.database import get_session
 from expense_tracker_backend.models.user import User
 
@@ -17,14 +17,16 @@ async def create_expense(
         db: AsyncSession = Depends(get_session),
         current_user : User = Depends(get_current_user)
 ):
-    return await expense_create(expense, current_user.id, db)
+    service = ExpenseService(db, current_user.id)
+    return await service.expense_create(expense)
 
 @router.get("/", response_model=List[ExpenseRead])
 async def read_expense(
         db: AsyncSession = Depends(get_session),
         current_user : User = Depends(get_current_user)
 ):
-    return await expense_read(current_user.id, db)
+    service = ExpenseService(db, current_user.id)
+    return await service.expense_read()
 
 @router.get("/{expense_id}", response_model=ExpenseRead)
 async def read_one_expense(
@@ -32,7 +34,8 @@ async def read_one_expense(
         db : AsyncSession = Depends(get_session),
         current_user: User = Depends(get_current_user)
 ):
-    expense = await get_expense(expense_id, current_user.id, db)
+    service = ExpenseService(db, current_user.id)
+    expense = await service.get_expense(expense_id)
     if not expense:
         raise HTTPException(status_code=404, detail="expense not found")
     return expense
@@ -44,7 +47,8 @@ async def update_expense(
         db: AsyncSession = Depends(get_session),
         current_user: User =Depends(get_current_user)
 ):
-    expense_result = await expense_update(expense_id, expense_data, current_user.id, db)
+    service = ExpenseService(db, current_user.id)
+    expense_result = await service.expense_update(expense_id, expense_data)
     if not expense_result:
         raise HTTPException(status_code=404, detail="Expense not found")
     return expense_result
@@ -55,7 +59,8 @@ async def delete_expense(
         current_user : User = Depends(get_current_user),
         db : AsyncSession = Depends(get_session),
 ):
-    success = await expense_delete(expense_id, current_user.id, db)
+    service = ExpenseService(db, current_user.id)
+    success = await service.expense_delete(expense_id)
     if not success:
         raise HTTPException(status_code=404, detail = "Expense not found to delete")
     return None
