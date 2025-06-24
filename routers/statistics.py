@@ -9,7 +9,7 @@ from expense_tracker_backend.core.Oauth import get_current_user
 from expense_tracker_backend.core.database import get_session
 from expense_tracker_backend.models.user import User
 from expense_tracker_backend.schemas.user import ExpenseStatsResponse
-from expense_tracker_backend.services.statistics import get_expense_statistics
+from expense_tracker_backend.services.statistics import ExpenseStatistics
 
 router = APIRouter(prefix="/statistics", tags=["Summary"])
 
@@ -20,7 +20,8 @@ async def expense_statistics(
         current_user : User = Depends(get_current_user)
 ):
     try:
-        return get_expense_statistics(current_user.id, days, db)
+        get_statistics = ExpenseStatistics(user_id=current_user.id, db=db)
+        return get_statistics.get_expense_breakdown(days=days)
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

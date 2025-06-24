@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from expense_tracker_backend.core.database import create_db_and_tables
-from expense_tracker_backend.routers import auth, crud
+from expense_tracker_backend.routers import auth, crud, statistics
 
 app = FastAPI(title="Expense Tracker API")
 
@@ -10,3 +10,4 @@ async def on_startup():
 
 app.include_router(auth.router)
 app.include_router(crud.router)
+app.include_router(statistics.router)

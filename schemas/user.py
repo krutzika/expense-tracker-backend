@@ -53,8 +53,13 @@ class ExpenseUpdate(BaseModel):
     category : Optional[Category] = None
     created_at : Optional[datetime]
 
+class CategoryBreakdown(BaseModel):
+    total: float
+    percent: float
+
 class ExpenseStatsResponse(BaseModel):
-    stats: Dict[str, float]
+    total_spent: float
+    by_category: Dict[str, CategoryBreakdown]
 
     class Config:
         orm_mode = True

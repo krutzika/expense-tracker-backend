@@ -1,2 +1,4 @@
 .env
 expense.db
+__pycache__
+venv
