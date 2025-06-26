@@ -63,3 +63,18 @@ class ExpenseStatsResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+
+class CategoryTotals(BaseModel):
+    total: float
+
+
+class ComparisonPeriod(BaseModel):
+    label: str  # e.g., "Previous 30 Days"
+    totals: Dict[str, CategoryTotals]  # category -> total
+
+
+class ExpenseComparisonResponse(BaseModel):
+    current_period: ComparisonPeriod
+    previous_period: ComparisonPeriod

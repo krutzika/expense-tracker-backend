@@ -41,14 +41,32 @@ class ExpenseStatistics:
 
         return {"total spent" : total_spent, "category_breakdown": breakdown}
 
-    async def _get_start_end_period(self, comparison_period: int) :
-
-
-    async def _get_total_category_expense_periodically(self, start_date: datetime, end_date : datetime) -> Dict:
+    async def _get_total_expense_time_period(self, start_date: datetime, end_date: datetime):
+        query = select(
+            Expense.category,
+            func.sum(Expense.amount)
+        ).where(
+            Expense.user_id == self.user_id,
+                Expense.created_at >= start_date,
+                Expense.created_at <= end_date
+                ).order_by(Expense.category)
+        result = await self.db.execute(query)
+        return query
 
     async def get_comparison(self, days: int) -> Dict:
         start_date = datetime.utcnow() - timedelta(days=days)
         end_date = datetime.utcnow()
+        start_date_2 = start_date - timedelta(days=days)
+        end_date_2 = start_date
+        expense_period_1 =await self._get_total_expense_time_period(start_date, end_date)
+        expense_period_2 = await self._get_total_expense_time_period(start_date_2, end_date_2)
+
+        return {
+                "current_period": expense_period_1,
+                "previous_period":expense_period_2
+        }
+
+
 
 
 
